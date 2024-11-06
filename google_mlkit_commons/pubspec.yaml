@@ -5,7 +5,7 @@ homepage: https://github.com/flutter-ml/google_ml_kit_flutter
 repository: https://github.com/flutter-ml/google_ml_kit_flutter/tree/master/packages/google_mlkit_commons
 
 environment:
-  sdk: ">=2.16.0 <4.0.0"
+  sdk: '>=3.2.0-0 <4.0.0'
   flutter: ">=2.5.0"
 
 dependencies:
