@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'vision_detector_views/bench_detector_view.dart';
 import 'vision_detector_views/biceps_detector_view.dart';
 import 'vision_detector_views/pushup_detector_view.dart';
@@ -6,9 +7,10 @@ import 'vision_detector_views/squat_detector_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  WakelockPlus.enable();
   runApp(MyApp());
 }
-
+ 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

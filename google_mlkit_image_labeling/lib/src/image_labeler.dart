@@ -80,10 +80,9 @@ class LocalLabelerOptions extends ImageLabelerOptions {
 
   /// Constructor to create an instance of [LocalLabelerOptions].
   LocalLabelerOptions(
-      {double confidenceThreshold = 0.5,
+      {super.confidenceThreshold,
       required this.modelPath,
-      this.maxCount = 10})
-      : super(confidenceThreshold: confidenceThreshold);
+      this.maxCount = 10});
 
   /// Returns a json representation of an instance of [LocalLabelerOptions].
   @override
@@ -110,10 +109,9 @@ class FirebaseLabelerOption extends ImageLabelerOptions {
 
   /// Constructor to create an instance of [FirebaseLabelerOption].
   FirebaseLabelerOption(
-      {double confidenceThreshold = 0.5,
+      {super.confidenceThreshold,
       required this.modelName,
-      this.maxCount = 10})
-      : super(confidenceThreshold: confidenceThreshold);
+      this.maxCount = 10});
 
   /// Returns a json representation of an instance of [FirebaseLabelerOption].
   @override

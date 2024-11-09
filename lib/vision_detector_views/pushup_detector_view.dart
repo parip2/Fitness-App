@@ -6,12 +6,13 @@ import 'painters/pose_painter.dart';
 
 class PushupDetectorView extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _PoseDetectorViewState();
+  State<StatefulWidget> createState() => _PushupDetectorViewState();
 }
 
-class _PoseDetectorViewState extends State<PushupDetectorView> {
+class _PushupDetectorViewState extends State<PushupDetectorView> {
   final PoseDetector _poseDetector =
       PoseDetector(options: PoseDetectorOptions());
+  final PushUpSequenceAnalyzer _sequenceAnalyzer = PushUpSequenceAnalyzer();
   bool _canProcess = true;
   bool _isBusy = false;
   CustomPaint? _customPaint;
@@ -19,8 +20,8 @@ class _PoseDetectorViewState extends State<PushupDetectorView> {
   var _cameraLensDirection = CameraLensDirection.back;
   
   // Store the latest analysis results
-  BicepCurlAnalysis? _rightArmAnalysis;
-  BicepCurlAnalysis? _leftArmAnalysis;
+  PushUpSequenceAnalysis? _currentSequenceAnalysis;
+  PushUpAnalysis? _currentPoseAnalysis;
 
   @override
   void dispose() async {
@@ -34,93 +35,238 @@ class _PoseDetectorViewState extends State<PushupDetectorView> {
     return Stack(
       children: [
         DetectorView(
-          title: 'Pose Detector',
+          title: 'Push-up Detector',
           customPaint: _customPaint,
           text: _text,
           onImage: _processImage,
           initialCameraLensDirection: _cameraLensDirection,
           onCameraLensDirectionChanged: (value) => _cameraLensDirection = value,
         ),
-        if (_rightArmAnalysis != null || _leftArmAnalysis != null)
-          Positioned(
-            top: 100,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_rightArmAnalysis != null) ...[
-                    Text(
-                      'Right Arm: ${_getStateEmoji(_rightArmAnalysis!.state)}',
-                      style: TextStyle(
-                        color: _getStateColor(_rightArmAnalysis!.state),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      _rightArmAnalysis!.message,
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(height: 8),
-                  ],
-                  if (_leftArmAnalysis != null) ...[
-                    Text(
-                      'Left Arm: ${_getStateEmoji(_leftArmAnalysis!.state)}',
-                      style: TextStyle(
-                        color: _getStateColor(_leftArmAnalysis!.state),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      _leftArmAnalysis!.message,
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
+        if (_currentPoseAnalysis != null) _buildFormFeedbackOverlay(),
+        _buildRepCounter(),
+        if (_currentSequenceAnalysis != null) _buildStageIndicator(),
       ],
     );
   }
 
-  Color _getStateColor(BicepCurlState state) {
+  Widget _buildFormFeedbackOverlay() {
+    final measurements = _currentPoseAnalysis!.measurements;
+    final List<_FormMetric> metrics = measurements != null ? [
+      _FormMetric(
+        icon: Icons.straighten,
+        label: 'Back Angle',
+        value: '${measurements.backAngle.toStringAsFixed(1)}°',
+        isGood: measurements.backAngle <= 15.0,
+      ),
+      _FormMetric(
+        icon: Icons.compass_calibration,
+        label: 'Elbow Angle',
+        value: '${((measurements.leftElbowAngle + measurements.rightElbowAngle) / 2).toStringAsFixed(1)}°',
+        isGood: (measurements.leftElbowAngle + measurements.rightElbowAngle) / 2 >= 75 &&
+                (measurements.leftElbowAngle + measurements.rightElbowAngle) / 2 <= 105,
+      ),
+    ] : [];
+
+    return Positioned(
+      top: 100,
+      left: 20,
+      right: 20,
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getStateColor(_currentPoseAnalysis!.state),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    _getStateDisplay(_currentPoseAnalysis!.state),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _currentSequenceAnalysis?.message ?? _currentPoseAnalysis!.message,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (metrics.isNotEmpty) ...[
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: metrics.map(_buildMetricDisplay).toList(),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+   Widget _buildMetricDisplay(_FormMetric metric) {
+    return Column(
+      children: [
+        Icon(
+          metric.icon,
+          color: metric.isGood ? Colors.green : Colors.orange,
+          size: 24,
+        ),
+        SizedBox(height: 4),
+        Text(
+          metric.label,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+          ),
+        ),
+        Text(
+          metric.value,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStageIndicator() {
+    final stage = _currentSequenceAnalysis!.sequenceState.currentStage;
+    
+    return Positioned(
+      bottom: 100,
+      left: 20,
+      right: 20,
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: PushUpStage.values.map((s) {
+            final isActive = s == stage;
+            final icon = _getStageIcon(s);
+            return Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isActive ? Colors.blue : Colors.grey.withOpacity(0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isActive ? Colors.white : Colors.white54,
+                size: 24,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  IconData _getStageIcon(PushUpStage stage) {
+    switch (stage) {
+      case PushUpStage.start:
+        return Icons.fitness_center;
+      case PushUpStage.descending:
+        return Icons.arrow_downward;
+      case PushUpStage.bottom:
+        return Icons.horizontal_rule;
+      case PushUpStage.ascending:
+        return Icons.arrow_upward;
+      case PushUpStage.invalid:
+        return Icons.error_outline;
+    }
+  }
+
+  Widget _buildRepCounter() {
+    final repCount = _currentSequenceAnalysis?.sequenceState.repCount ?? 0;
+    final goodForm = _currentSequenceAnalysis?.sequenceState.goodFormMaintained ?? true;
+    
+    return Positioned(
+      top: 40,
+      right: 20,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.fitness_center,
+              color: goodForm ? Colors.green : Colors.orange,
+            ),
+            SizedBox(width: 8),
+            Text(
+              '$repCount',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getStateColor(PushUpState state) {
     switch (state) {
-      case BicepCurlState.goodForm:
+      case PushUpState.goodForm:
         return Colors.green;
-      case BicepCurlState.start:
+      case PushUpState.plank:
         return Colors.blue;
-      case BicepCurlState.elbowTooFar:
-      case BicepCurlState.incompleteCurl:
+      case PushUpState.improperBackAlignment:
+      case PushUpState.insufficientDepth:
+      case PushUpState.improperArmPosition:
         return Colors.orange;
-      case BicepCurlState.lowConfidence:
-      case BicepCurlState.invalidPosition:
+      case PushUpState.lowConfidence:
+      case PushUpState.invalidPosition:
         return Colors.red;
     }
   }
 
-  String _getStateEmoji(BicepCurlState state) {
+  String _getStateDisplay(PushUpState state) {
     switch (state) {
-      case BicepCurlState.goodForm:
-        return '✅';
-      case BicepCurlState.start:
-        return '👉';
-      case BicepCurlState.elbowTooFar:
-        return '⚠️';
-      case BicepCurlState.incompleteCurl:
-        return '⬆️';
-      case BicepCurlState.lowConfidence:
-        return '❓';
-      case BicepCurlState.invalidPosition:
-        return '❌';
+      case PushUpState.goodForm:
+        return '✓ GOOD FORM';
+      case PushUpState.plank:
+        return '⟳ PLANK';
+      case PushUpState.improperBackAlignment:
+        return '⚠ BACK';
+      case PushUpState.insufficientDepth:
+        return '⚠ DEPTH';
+      case PushUpState.improperArmPosition:
+        return '⚠ ARMS';
+      case PushUpState.lowConfidence:
+        return '? UNCLEAR';
+      case PushUpState.invalidPosition:
+        return '× INVALID';
     }
   }
 
@@ -137,21 +283,18 @@ class _PoseDetectorViewState extends State<PushupDetectorView> {
       final poses = await _poseDetector.processImage(inputImage);
       
       if (poses.isNotEmpty) {
-        // Analyze each arm separately
-        _leftArmAnalysis = BicepCurlAnalyzer.analyzePose(
-          poses.first, 
-          isRightArm: false
-        );
-        _rightArmAnalysis = BicepCurlAnalyzer.analyzePose(
-          poses.first, 
-          isRightArm: true
-        );
-            
-        setState(() {});
+        // Get both pose and sequence analysis
+        final poseAnalysis = PushUpAnalyzer.analyzePose(poses.first);
+        final sequenceAnalysis = _sequenceAnalyzer.analyzeFrame(poseAnalysis);
+        
+        setState(() {
+          _currentPoseAnalysis = poseAnalysis;
+          _currentSequenceAnalysis = sequenceAnalysis;
+        });
       } else {
         setState(() {
-          _leftArmAnalysis = null;
-          _rightArmAnalysis = null;
+          _currentPoseAnalysis = null;
+          _currentSequenceAnalysis = null;
         });
       }
 
@@ -175,4 +318,18 @@ class _PoseDetectorViewState extends State<PushupDetectorView> {
       }
     }
   }
+}
+
+class _FormMetric {
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool isGood;
+
+  _FormMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.isGood,
+  });
 }

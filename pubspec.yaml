@@ -24,6 +24,8 @@ dependencies:
     path: google_mlkit_image_labeling
   google_mlkit_pose_detection:
     path: google_mlkit_pose_detection
+  wakelock_plus: ^1.2.8
+  wakelock_plus_platform_interface: ^1.1.0
 
 dependency_overrides:
   google_mlkit_commons:
