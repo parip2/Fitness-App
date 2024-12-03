@@ -21,6 +21,30 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: const Text('Welcome to the Home Page!'),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        // Added BottomNavigationBar
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home), // Home icon
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: 0,
+        selectedItemColor: Colors.deepPurple,
+        onTap: (index) {},
+      ),
     );
   }
 }
