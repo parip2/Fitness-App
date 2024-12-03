@@ -1,14 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'profile.dart'; // Import the profile page
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0; // Track the selected index
+
+  // List of widgets for each tab
+  final List<Widget> _pages = const [
+    Center(child: Text('Welcome to the Home Page!')), // Home content
+    Center(child: Text('Search Page (Dummy Content)')), // Search content
+    Center(
+        child: Text(
+            'Notifications Page (Dummy Content)')), // Notifications content
+    ProfilePage(), // Profile page
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // Update the selected index
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Appbar'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout), // Logout icon
@@ -18,11 +42,8 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: const Text('Welcome to the Home Page!'),
-      ),
+      body: _pages[_selectedIndex], // Display the selected page
       bottomNavigationBar: BottomNavigationBar(
-        // Added BottomNavigationBar
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home), // Home icon
@@ -41,9 +62,9 @@ class HomePage extends StatelessWidget {
             label: 'Profile',
           ),
         ],
-        currentIndex: 0,
+        currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurple,
-        onTap: (index) {},
+        onTap: _onItemTapped,
       ),
     );
   }
