@@ -13,8 +13,10 @@ class SignupPage extends StatelessWidget {
         TextEditingController(); // Add username controller
 
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A2E), // Dark blue background
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        title: const Text('Sign Up', style: TextStyle(color: Colors.white)), // White text
+        backgroundColor: const Color(0xFF1A1A2E), // Match app bar with background
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -25,56 +27,54 @@ class SignupPage extends StatelessWidget {
               controller: usernameController, // Capture username input
               decoration: const InputDecoration(
                 labelText: 'Username',
+                labelStyle: TextStyle(color: Colors.white), // White label text
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline on focus
+                ),
               ),
+              style: const TextStyle(color: Colors.white), // White text
             ),
             TextField(
               controller: emailController, // Capture email input
               decoration: const InputDecoration(
                 labelText: 'Email',
+                labelStyle: TextStyle(color: Colors.white), // White label text
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline on focus
+                ),
               ),
+              style: const TextStyle(color: Colors.white), // White text
             ),
             TextField(
               controller: passwordController, // Capture password input
               decoration: const InputDecoration(
                 labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.white), // White label text
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white), // White underline on focus
+                ),
               ),
               obscureText: true,
+              style: const TextStyle(color: Colors.white), // White text
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                // Handle signup logic here
-                try {
-                  UserCredential userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-
-                  // Store user data in Firestore
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(userCredential.user?.uid)
-                      .set({
-                    'username': usernameController.text,
-                    'email': emailController.text,
-                    // Add any other user fields you want to store
-                  });
-
-                  // Optionally, navigate to another page or show a success message
-                } on FirebaseAuthException catch (e) {
-                  // Handle error (e.g., show a message)
-                  print(e.message);
-                }
+                // Handle sign up logic here
               },
               child: const Text('Sign Up'),
-            ),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Navigate back to login page
-              },
-              child: const Text('Already have an account? Login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4ECDC4), // Button color
+              ),
             ),
           ],
         ),

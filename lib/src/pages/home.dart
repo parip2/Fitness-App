@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'login.dart'; // Import the login page
 import 'profile.dart'; // Import the profile page
 
 class HomePage extends StatefulWidget {
@@ -14,11 +15,9 @@ class _HomePageState extends State<HomePage> {
 
   // List of widgets for each tab
   final List<Widget> _pages = const [
-    Center(child: Text('Welcome to the Home Page!')), // Home content
+    WeeklyWorkoutChallenge(), // New workout challenge page
     Center(child: Text('Search Page (Dummy Content)')), // Search content
-    Center(
-        child: Text(
-            'Notifications Page (Dummy Content)')), // Notifications content
+    Center(child: Text('Notifications Page (Dummy Content)')), // Notifications content
     ProfilePage(), // Profile page
   ];
 
@@ -28,19 +27,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut(); // Sign out the user
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()), // Navigate to login page
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Appbar'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout), // Logout icon
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut(); // Sign out the user
-            },
-          ),
-        ],
+        title: const Text('PowerUP', style: TextStyle(color: Colors.white)), // Generic title for other pages
+        backgroundColor: const Color(0xFF1A1A2E), // Match app bar with background
+        leading: IconButton(
+          icon: const Icon(Icons.logout, color: Colors.white), // Logout icon
+          onPressed: _logout, // Call logout function
+        ),
       ),
       body: _pages[_selectedIndex], // Display the selected page
       bottomNavigationBar: BottomNavigationBar(
@@ -65,6 +69,80 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurple,
         onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class WeeklyWorkoutChallenge extends StatelessWidget {
+  const WeeklyWorkoutChallenge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1A2E), // Dark blue background
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const SizedBox(height: 20),
+            const Text(
+              'Weekly Workout Challenge',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Workout Options
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildWorkoutCard('Workout Name 1', 'Monday'),
+                  const SizedBox(height: 10),
+                  _buildWorkoutCard('Workout Name 2', 'Tuesday'),
+                  const SizedBox(height: 10),
+                  _buildWorkoutCard('Workout Name 3', 'Wednesday'),
+                  const SizedBox(height: 10),
+                  _buildWorkoutCard('Workout Name 4', 'Thursday'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkoutCard(String workoutName, String day) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF4ECDC4), // Card color
+        borderRadius: BorderRadius.circular(15), // Rounded corners
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            workoutName,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            day,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }
