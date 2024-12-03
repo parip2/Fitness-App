@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'signup.dart'; // Import the signup page
+import '../models/user_model.dart'; // Import the UserModel
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -42,8 +44,25 @@ class LoginPage extends StatelessWidget {
                     email: emailController.text,
                     password: passwordController.text,
                   );
+
+                  // Fetch user data from Firestore
+                  DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(userCredential.user?.uid)
+                      .get();
+
+                  // Create a UserModel instance
+                  UserModel user =
+                      UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+
+                  // Store user data in a global state or pass it to the next screen
+                  // For example, you can use a simple singleton or state management solution
+                  // Here, we'll just print it for demonstration
+                  print(
+                      'User Info: ${user.username}, ${user.email}, ${user.bio}');
                 } catch (e) {
                   // Handle login error
+                  print(e);
                 }
               },
               child: const Text('Login'),
