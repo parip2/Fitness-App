@@ -58,6 +58,11 @@ class MyApp extends StatelessWidget {
   }
   
   Widget _buildAuthenticatedFlow() {
+    // Temporary development bypass - comment this out before production!
+    return const HomePage();  // This will directly show the HomePage without authentication
+
+    // Original authentication code - uncomment this before production
+    /*
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -70,5 +75,6 @@ class MyApp extends StatelessWidget {
         return const LoginPage();
       },
     );
+    */
   }
 }

@@ -5,106 +5,203 @@ import 'signup.dart'; // Import the signup page
 import 'home.dart'; // Import the home page
 import '../models/user_model.dart'; // Import the UserModel
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
+  bool isPasswordVisible = false;
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E), // Dark blue background
-      appBar: AppBar(
-        title: const Text('Login', style: TextStyle(color: Colors.white)), // White text
-        backgroundColor: const Color(0xFF1A1A2E), // Match app bar with background
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: emailController, // Capture email input
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.white), // White label text
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White underline
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White underline on focus
+      backgroundColor: const Color(0xFF1A1A2E),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 60),
+              // App Logo or Title
+              const Icon(
+                Icons.fitness_center,
+                size: 80,
+                color: Color(0xFF4ECDC4),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Welcome Back!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-              style: const TextStyle(color: Colors.white), // White text
-            ),
-            TextField(
-              controller: passwordController, // Capture password input
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.white), // White label text
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White underline
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white), // White underline on focus
+              const SizedBox(height: 48),
+              // Email Field
+              TextField(
+                controller: emailController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  prefixIcon: const Icon(Icons.email, color: Color(0xFF4ECDC4)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.white24),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF4ECDC4)),
+                  ),
                 ),
               ),
-              obscureText: true,
-              style: const TextStyle(color: Colors.white), // White text
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                // Handle login logic here
-                try {
-                  UserCredential userCredential =
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-
-                  // Fetch user data from Firestore
-                  DocumentSnapshot userDoc = await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(userCredential.user?.uid)
-                      .get();
-
-                  // Create a UserModel instance
-                  UserModel user =
-                      UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-
-                  // Navigate to the home page after successful login
-                  Navigator.pushReplacement(
+              const SizedBox(height: 16),
+              // Password Field
+              TextField(
+                controller: passwordController,
+                obscureText: !isPasswordVisible,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF4ECDC4)),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.white24),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF4ECDC4)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Login Button
+              ElevatedButton(
+                onPressed: isLoading ? null : _handleLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4ECDC4),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 16),
+              // Sign Up Link
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()), // Navigate to home page
+                    MaterialPageRoute(builder: (context) => const SignupPage()),
                   );
-
-                  // Store user data in a global state or pass it to the next screen
-                  print('User Info: ${user.username}, ${user.email}, ${user.bio}');
-                } catch (e) {
-                  // Handle login error
-                  print(e);
-                }
-              },
-              child: const Text('Login'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4ECDC4), // Button color
+                },
+                child: const Text(
+                  'Don\'t have an account? Sign Up',
+                  style: TextStyle(color: Color(0xFF4ECDC4)),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignupPage()),
-                );
-              },
-              child: const Text('Don\'t have an account? Sign Up', style: TextStyle(color: Colors.white)), // White text
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleLogin() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      _showErrorSnackBar('Please fill in all fields');
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      // Fetch user data from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .get();
+
+      if (userDoc.exists) {
+        UserModel user = UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+        print('User logged in: ${user.username}');
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String errorMessage = 'An error occurred during login';
+      if (e.code == 'user-not-found') {
+        errorMessage = 'No user found with this email';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'Wrong password provided';
+      }
+      _showErrorSnackBar(errorMessage);
+    } catch (e) {
+      _showErrorSnackBar('An unexpected error occurred');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }

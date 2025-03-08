@@ -7,14 +7,15 @@ class UserService {
   UserModel? currentUser;
 
   factory UserService() {
-    _instance._loadCurrentUser();
     return _instance;
   }
 
-  UserService._internal();
+  UserService._internal() {
+    loadCurrentUser(); // Changed to call the public method
+  }
 
-  // Method to fetch user details from Firestore
-  Future<void> _loadCurrentUser() async {
+  // Changed from _loadCurrentUser to loadCurrentUser (made public)
+  Future<void> loadCurrentUser() async {
     try {
       // Assuming there's a way to get the current user's UID
       String uid = FirebaseAuth.instance.currentUser?.uid ??
