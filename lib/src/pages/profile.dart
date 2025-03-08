@@ -3,6 +3,7 @@ import '../services/user_service.dart'; // Import UserService
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import 'dart:math' as math;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -65,170 +66,174 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(user);
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E), // Background color
+      backgroundColor: const Color(0xFF1A1A2E),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Profile Header Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF252A48),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
+        child: Column(
+          children: [
+            // Profile Header with gradient background
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.deepPurple.shade900,
+                    const Color(0xFF1A1A2E),
+                  ],
                 ),
-                child: Column(
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Color(0xFF4ECDC4),
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
+              ),
+              child: Column(
+                children: [
+                  // Profile Image and Name
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white24,
+                    child: Text(
+                      user?.username?.substring(0, 1).toUpperCase() ?? 'U',
+                      style: const TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(height: 15),
-                    // Editable Name Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isEditing) ...[
-                          Expanded(
-                            child: TextField(
-                              controller: nameController,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF4ECDC4)),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xFF4ECDC4)),
-                                ),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.check, color: Color(0xFF4ECDC4)),
-                            onPressed: _updateUsername,
-                          ),
-                        ] else ...[
-                          Text(
-                            user?.username ?? 'Your Name',
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isEditing) ...[
+                        Expanded(
+                          child: TextField(
+                            controller: nameController,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
+                            textAlign: TextAlign.center,
+                            decoration: const InputDecoration(
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Color(0xFF4ECDC4)),
-                            onPressed: () => setState(() => isEditing = true),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          onPressed: _updateUsername,
+                        ),
+                      ] else ...[
+                        Text(
+                          user?.username ?? 'Your Name',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.white),
+                          onPressed: () => setState(() => isEditing = true),
+                        ),
                       ],
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '@${user?.username ?? 'username'}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Stats Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildStatColumn('Workouts', '12'),
-                        _buildDivider(),
-                        _buildStatColumn('Streak', '5 days'),
-                        _buildDivider(),
-                        _buildStatColumn('Level', '3'),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                  // Stats Row
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStat('165.0', 'Height', 'cm'),
+                      _buildStat('73.0', 'Weight', 'kg'),
+                      _buildStat('27.5', 'Age', 'year'),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              // Body Stats Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Body Stats',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatCard('Height', '180.0', 'cm'),
-                        _buildStatCard('Weight', '73.0', 'kg'),
-                        _buildStatCard('BMI', '22.5', ''),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Recent Activity Section
-              Padding(
+            ),
+            // Activity Graph
+            Expanded(
+              child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Recent Activity',
+                      'Activity',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 15),
-                    _buildActivityTile(
-                      'Completed Workout',
-                      'Upper Body Strength',
-                      '2 hours ago',
-                      Icons.fitness_center,
+                    const SizedBox(height: 20),
+                    // Activity Period Selector
+                    Row(
+                      children: [
+                        _buildPeriodButton('WEEK', true),
+                        const SizedBox(width: 10),
+                        _buildPeriodButton('MONTH', false),
+                        const SizedBox(width: 10),
+                        _buildPeriodButton('ALL TIME', false),
+                      ],
                     ),
-                    _buildActivityTile(
-                      'Achievement Unlocked',
-                      'First Mile Stone',
-                      'Yesterday',
-                      Icons.emoji_events,
-                    ),
-                    _buildActivityTile(
-                      'New Personal Record',
-                      'Bench Press: 80kg',
-                      '2 days ago',
-                      Icons.trending_up,
+                    const SizedBox(height: 20),
+                    // Activity Graph
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _buildBar('Sun', 0.3, false),
+                                  _buildBar('Mon', 0.5, false),
+                                  _buildBar('Tue', 0.4, false),
+                                  _buildBar('Wed', 0.6, false),
+                                  _buildBar('Thu', 0.3, false),
+                                  _buildBar('Fri', 0.8, true),
+                                  _buildBar('Sat', 0.2, false),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Days row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildDayLabel('Sun'),
+                                _buildDayLabel('Mon'),
+                                _buildDayLabel('Tue'),
+                                _buildDayLabel('Wed'),
+                                _buildDayLabel('Thu'),
+                                _buildDayLabel('Fri'),
+                                _buildDayLabel('Sat'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildStatColumn(String label, String value) {
+  Widget _buildStat(String value, String label, String unit) {
     return Column(
       children: [
         Text(
@@ -239,9 +244,8 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 5),
         Text(
-          label,
+          '$label ($unit)',
           style: const TextStyle(
             color: Colors.white70,
             fontSize: 14,
@@ -251,105 +255,52 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildPeriodButton(String text, bool isSelected) {
     return Container(
-      height: 30,
-      width: 1,
-      color: Colors.white24,
-    );
-  }
-
-  Widget _buildStatCard(String label, String value, String unit) {
-    return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF252A48),
-        borderRadius: BorderRadius.circular(15),
+        color: isSelected ? Colors.pink : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 5),
-          RichText(
-            text: TextSpan(
-              text: value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              children: [
-                TextSpan(
-                  text: ' $unit',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.white70,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
     );
   }
 
-  Widget _buildActivityTile(String title, String subtitle, String time, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: const Color(0xFF252A48),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4ECDC4).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: const Color(0xFF4ECDC4)),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
+  Widget _buildBar(String day, double height, bool isActive) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          width: 30,
+          height: 150 * height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Colors.blue.withOpacity(0.2),
+                isActive ? Colors.pink : Colors.blue.withOpacity(0.5),
               ],
             ),
+            borderRadius: BorderRadius.circular(15),
           ),
-          Text(
-            time,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-            ),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDayLabel(String day) {
+    return Text(
+      day,
+      style: const TextStyle(
+        color: Colors.white70,
+        fontSize: 12,
       ),
     );
   }
