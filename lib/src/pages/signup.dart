@@ -71,10 +71,10 @@ class SignupPage extends StatelessWidget {
               onPressed: () async {
                 // Handle sign up logic here
               },
-              child: const Text('Sign Up'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4ECDC4), // Button color
               ),
+              child: const Text('Sign Up'),
             ),
           ],
         ),

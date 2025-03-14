@@ -11,7 +11,7 @@ class PersonalizationPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text('Personalize question 1?'),
+            const Text('Personalize question 1?'),
             // Add options here
             // Example options
             RadioListTile(
@@ -27,7 +27,7 @@ class PersonalizationPage extends StatelessWidget {
               onChanged: (value) {},
             ),
             const SizedBox(height: 20),
-            Text('Personalize question 2?'),
+            const Text('Personalize question 2?'),
             // Add options here
             ElevatedButton(onPressed: () {}, child: const Text('Next')),
           ],

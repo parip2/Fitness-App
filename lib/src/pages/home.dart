@@ -48,10 +48,16 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _pages[_selectedIndex], // Display the selected page
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: const Color(0xFF1A1A2E),
+        type: BottomNavigationBarType.fixed,
+        unselectedItemColor: Colors.deepPurple,
+        selectedItemColor: Colors.white,
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home), // Home icon
-            label: 'Home',
+            icon: Icon(Icons.fitness_center),
+            label: 'Workouts',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
@@ -66,9 +72,6 @@ class _HomePageState extends State<HomePage> {
             label: 'Profile',
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.deepPurple,
-        onTap: _onItemTapped,
       ),
     );
   }
