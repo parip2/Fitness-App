@@ -13,13 +13,13 @@ import 'firebase_options.dart'
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure binding is initialized
-  
+
   // Initialize Firebase with platform-specific handling
   try {
     if (kIsWeb) {
       // Web-specific initialization
       await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.web,
+        options: DefaultFirebaseOptions.currentPlatform,
       );
       print('Firebase initialized for web');
     } else if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
@@ -34,7 +34,7 @@ void main() async {
   } catch (e) {
     print('Firebase initialization error: $e');
   }
-  
+
   runApp(const MyApp());
 }
 
@@ -56,10 +56,10 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-  
+
   Widget _buildAuthenticatedFlow() {
     // Temporary development bypass - comment this out before production!
-    return const HomePage();  // This will directly show the HomePage without authentication
+    return const HomePage(); // This will directly show the HomePage without authentication
 
     // Original authentication code - uncomment this before production
     /*
