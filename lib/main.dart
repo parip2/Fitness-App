@@ -3,13 +3,14 @@ import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'src/pages/login.dart'; // Import the login page
 import 'src/pages/home.dart'; // Import the home page
+import 'src/pages/notifications.dart'; // Import NotificationsPage
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 // Import firebase_options correctly
-import 'firebase_options.dart'
-    if (dart.library.html) 'firebase_options.dart'
-    if (dart.library.io) 'firebase_options_stub.dart';
+import 'firebase_options.dart';
+    // if (dart.library.html) 'firebase_options.dart'
+    // if (dart.library.io) 'firebase_options_stub.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure binding is initialized
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/notifications': (context) => const NotificationsPage(),
       },
     );
   }
