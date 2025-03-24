@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               const Text(
-                'CREATE AN ACCOUNT',
+                'LOGIN',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -48,15 +48,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 40),
               // Input Fields
-              _buildInputField('Enter Your Username', Icons.person),
+              _buildInputField('Enter Your Email', Icons.email, emailController),
               const SizedBox(height: 16),
-              _buildInputField('Enter Your Email', Icons.email),
-              const SizedBox(height: 16),
-              _buildInputField('Enter Your Phone Number', Icons.phone),
-              const SizedBox(height: 16),
-              _buildInputField('Enter Your Password', Icons.lock, isPassword: true),
+              _buildInputField('Enter Your Password', Icons.lock, passwordController, isPassword: true),
               const SizedBox(height: 40),
-              // Sign Up Button
+              // Login Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown,
@@ -65,9 +61,9 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: _handleLogin,
                 child: const Text(
-                  'Sign Up',
+                  'Login',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -92,23 +88,28 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               // Social Buttons
-              _buildSocialButton('Sign up with Facebook', Icons.facebook),
+              _buildSocialButton('Login with Facebook', Icons.facebook),
               const SizedBox(height: 16),
-              _buildSocialButton('Sign up with Google', Icons.g_mobiledata),
+              _buildSocialButton('Login with Google', Icons.g_mobiledata),
               const SizedBox(height: 30),
-              // Login Link
+              // Signup Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Already have an account? ',
-                    style: TextStyle(color: Colors.white70),
+                    "Don't have an account? ",
+                    style: TextStyle(color: Colors.white),
                   ),
-                  TextButton(
-                    onPressed: () {},
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/signup'); // Navigate to signup
+                    },
                     child: const Text(
-                      'Login',
-                      style: TextStyle(color: Colors.blue),
+                      "Sign Up",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ],
@@ -120,8 +121,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildInputField(String hint, IconData icon, {bool isPassword = false}) {
+  Widget _buildInputField(String hint, IconData icon, TextEditingController controller, {bool isPassword = false}) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

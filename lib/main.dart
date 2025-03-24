@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'src/pages/login.dart'; // Import the login page
+import 'src/pages/signup.dart'; // Import the signup page
 import 'src/pages/home.dart'; // Import the home page
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/signup': (context) => const SignupPage(),
       },
     );
   }
