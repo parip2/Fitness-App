@@ -6,6 +6,7 @@ import 'src/pages/signup.dart'; // Import the signup page
 import 'src/pages/home.dart'; // Import the home page
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'src/pages/notifications.dart';
 
 // Import firebase_options correctly
 import 'firebase_options.dart'
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/signup': (context) => const SignupPage(),
+        '/notifications': (context) => const NotificationsPage(),
       },
     );
   }

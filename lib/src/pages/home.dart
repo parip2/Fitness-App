@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'login.dart'; // Import the login page
 import 'profile.dart'; // Import the profile page
 import 'dart:math';
+import 'notifications.dart';
+import 'nutrition.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,8 +19,8 @@ class _HomePageState extends State<HomePage> {
   // List of widgets for each tab
   final List<Widget> _pages = const [
     WeeklyWorkoutChallenge(), // New workout challenge page
-    Center(child: Text('Search Page (Dummy Content)')), // Search content
-    Center(child: Text('Notifications Page (Dummy Content)')), // Notifications content
+    NutritionPage(),
+    NotificationsPage(),
     ProfilePage(), // Profile page
   ];
 
@@ -61,8 +63,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Workouts',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.restaurant_menu), 
+            label: 'Nutrition',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
