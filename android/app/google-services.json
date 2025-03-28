@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "257021282149",
+    "project_id": "pc-fitness",
+    "storage_bucket": "pc-fitness.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257021282149:android:fb8b96d08fadf23ea3838c",
+        "android_client_info": {
+          "package_name": "com.example.fine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWYchOWlrht0V-LIDM1P3Hluuf1wzSvFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257021282149:android:48001e4acad96054a3838c",
+        "android_client_info": {
+          "package_name": "com.example.fitness_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWYchOWlrht0V-LIDM1P3Hluuf1wzSvFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257021282149:android:5ea6b882b640b414a3838c",
+        "android_client_info": {
+          "package_name": "com.pcfitness.ap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWYchOWlrht0V-LIDM1P3Hluuf1wzSvFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257021282149:android:a2b61119d6361098a3838c",
+        "android_client_info": {
+          "package_name": "com.pcfitness.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWYchOWlrht0V-LIDM1P3Hluuf1wzSvFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
