@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import 'dart:math' as math;
+import 'week.dart';
+import 'activity.dart';
+import 'alltime.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -171,11 +174,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     // Activity Period Selector
                     Row(
                       children: [
-                        _buildPeriodButton('WEEK', true),
+                        _buildPeriodButton('WEEK', const WeekActivityPage()),
                         const SizedBox(width: 10),
-                        _buildPeriodButton('MONTH', false),
+                        _buildPeriodButton('MONTH', const MonthActivityPage()),
                         const SizedBox(width: 10),
-                        _buildPeriodButton('ALL TIME', false),
+                        _buildPeriodButton('ALL TIME', const AllTimeActivityPage()),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -255,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildPeriodButton(String text, bool isSelected) {
+  /*Widget _buildPeriodButton(String text, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
@@ -267,6 +270,32 @@ class _ProfilePageState extends State<ProfilePage> {
         style: TextStyle(
           color: isSelected ? Colors.white : Colors.white70,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+    );
+
+    
+  }*/
+  Widget _buildPeriodButton(String text, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.pink,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
