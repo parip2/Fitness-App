@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _logout() async {
     //await FirebaseAuth.instance.signOut(); // Sign out the user
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()), // Navigate to login page
     );
@@ -184,44 +184,77 @@ class WorkoutDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          workoutName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text(workoutName,
+            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF1A1A2E),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       backgroundColor: const Color(0xFF1A1A2E),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Workout Details',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Section header
+          Text(
+            'Workout Details',
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          // Day + Description card
+          Card(
+            color: const Color(0xFF2E2E3A),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today, color: Colors.white70, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Day: $day',
+                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    selectedDescription,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      height: 1.5, // loosen line-spacing for readability
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Day: $day',
-              style: const TextStyle(color: Colors.white70, fontSize: 18),
+          ),
+
+          const SizedBox(height: 24),
+          // Start button
+          ElevatedButton.icon(
+            onPressed: () {
+              // TODO: wire up start logic
+            },
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('Start Workout',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFd8aa74),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            const SizedBox(height: 10),
-            Text(
-              selectedDescription, // Display a random workout description
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
