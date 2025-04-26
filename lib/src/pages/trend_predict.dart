@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'home.dart'; // Navigate back to home
 
 /// A simple model to hold each data point with a day and a value.
 class DataPoint {
@@ -65,7 +66,7 @@ class _TrendPredictionPageState extends State<TrendPredictionPage> {
     // We include the last actual point to make a continuous transition.
     predictedData = [];
     final lastDay = actualData.last.day;
-    // Let's predict for days: lastDay, lastDay + 1, lastDay + 2, lastDay + 3
+    
     for (int i = 0; i < 4; i++) {
       final day = lastDay + i;
       final predictedValue = intercept + slope * day;
@@ -90,21 +91,27 @@ class _TrendPredictionPageState extends State<TrendPredictionPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
-        title: const Text(
-          'Trend Prediction',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Predicted Trends', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF1A1A2E),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward, color: Colors.redAccent),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+          ),
+        ],
       ),
+      //I added some code to let user come back to homepage
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const Text(
-              'Predicting the Trend Based on Data',
-              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             Expanded(
               child: LineChart(
                 LineChartData(
@@ -157,7 +164,7 @@ class _TrendPredictionPageState extends State<TrendPredictionPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               'Regression Line: y = ${intercept.toStringAsFixed(2)} + ${slope.toStringAsFixed(2)}x',
               style: const TextStyle(color: Colors.white70, fontSize: 14),
